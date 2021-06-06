@@ -1,6 +1,0 @@
-syntax = "proto3";
-package file.proto;
-message File {
-    int64 index = 1;
-    bytes buf = 2;
-}

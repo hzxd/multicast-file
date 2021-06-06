@@ -1,9 +1,12 @@
 package main
 
 import (
-	"multicast-file/net"
+	"flag"
 	"fmt"
+	"multicast-file/file"
+	"multicast-file/net"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -17,5 +20,22 @@ func main() {
 		fmt.Printf("Set ttl error:%s\n", err.Error())
 		return
 	}
-	net.SendMsg(socketMC)
+	path := flag.Args()[len(flag.Args())-1]
+	ch := make(chan *file.FileMessage, 10)
+	stop := make(chan bool)
+	go file.GrpcServer()
+	go file.SendFile(path, ch, stop)
+
+	for {
+		select {
+		case data := <-ch:
+			net.SendFileMsg(socketMC, data)
+			time.Sleep(time.Millisecond * 100)
+			fmt.Println("send ", data.Index)
+		case <-stop:
+			break
+		}
+	}
+
+	time.Sleep(time.Second * 5)
 }

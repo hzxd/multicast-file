@@ -1,0 +1,18 @@
+syntax = "proto3";
+package file;
+message FileMessage {
+    int64 index = 1;
+    bytes buf = 2;
+    string filename = 3;
+    int64 block = 4;
+    int64 type = 5;
+}
+
+message FileReq {
+    int64 index = 1;
+}
+
+service FileSrv {
+    rpc GetDataByIndex (FileReq) returns (FileMessage) {
+    }
+}
